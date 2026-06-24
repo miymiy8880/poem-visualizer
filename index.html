@@ -1,1 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura: Infinite Esoteric Poetry</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Georgia', serif;
+            color: #ffffff;
+            overflow: hidden;
+            text-align: center;
+            background: linear-gradient(135deg, #09090e, #131124, #22123b);
+            background-size: 400% 400%;
+            transition: background 3s ease-in-out;
+            animation: gradientMovement 20s ease infinite;
+        }
+
+        @keyframes gradientMovement {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 750px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quote-text {
+            font-size: 2rem;
+            line-height: 1.7;
+            font-style: italic;
+            margin-bottom: 30px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 1.5s ease, transform 1.5s ease;
+        }
+
+        .mood-tag {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 18px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .visible {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        button {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 14px 32px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.5s ease;
+            outline: none;
+        }
+
+        button:hover:not(:disabled) {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 10px 25px rgba(255,255,255,0.15);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: wait;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="quoteDisplay" class="quote-text">Awakening the oracle...</div>
+        <div id="moodDisplay" class="mood-tag">Connecting</div>
+        <button id="actionBtn" onclick="generateAIPoetry()">Channel Verse</button>
+    </div>
+
+    <script>
+        const GRADIENTS = [
+            "linear-gradient(135deg, #09090e, #131124, #22123b)", // Void / Shadow Mysticism
+            "linear-gradient(135deg, #0d1b2a, #1b263b, #415a77)", // Deep Oceanic Consciousness
+            "linear-gradient(135deg, #280f34, #180b22, #0f172a)", // Cosmic Alchemy
+            "linear-gradient(135deg, #102a23, #061712, #1a1c1e)", // Emerald Shamanic Resonance
+            "linear-gradient(135deg, #4c1d95, #762572, #1e1b4b)", // Violet Transmutation
+            "linear-gradient(135deg, #371a1a, #1a0f0f, #0c0a0a)"  // Primal Fire
+        ];
+
+        const MOODS = ["Cosmic Alignment", "Ethereal Drift", "Shadow Work", "Sacred Silence", "Timeless Paradox", "Alchemical Fire", "The Quiet Void"];
+
+        async function generateAIPoetry() {
+            const textEl = document.getElementById("quoteDisplay");
+            const moodEl = document.getElementById("moodDisplay");
+            const btnEl = document.getElementById("actionBtn");
+
+            textEl.classList.remove("visible");
+            moodEl.classList.remove("visible");
+            btnEl.disabled = true;
+            btnEl.innerText = "Channelling...";
+
+            try {
+                // Utilizing Puter's direct AI completion tool seamlessly
+                const response = await puter.ai.chat(
+                    "You are an ancient, esoteric oracle. Write a single profound, deeply introspective, spiritual, or philosophical poetic line or short couplet (maximum 2 sentences). It must feel mystical, beautiful, and deeply evocative. Do not include quote marks, titles, labels, or filler. Output ONLY the raw poem.",
+                    { model: 'openai/gpt-oss-120b' }
+                );
+
+                let aiVerse = response.toString().trim();
+                aiVerse = aiVerse.replace(/^["']|["']$/g, ''); // Clear random quotes
+
+                const randomGradient = GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
+                const randomMood = MOODS[Math.floor(Math.random() * MOODS.length)];
+
+                setTimeout(() => {
+                    textEl.innerText = aiVerse;
+                    moodEl.innerText = randomMood;
+                    document.body.style.background = randomGradient;
+                    document.body.style.backgroundSize = "400% 400__";
+
+                    textEl.classList.add("visible");
+                    moodEl.classList.add("visible");
+                    btnEl.disabled = false;
+                    btnEl.innerText = "Channel Verse";
+                }, 400);
+
+            } catch (error) {
+                console.error(error);
+                setTimeout(() => {
+                    textEl.innerText = "The connection to the ether wavered. Try leaning inward once more.";
+                    moodEl.innerText = "Static Disruption";
+                    textEl.classList.add("visible");
+                    moodEl.classList.add("visible");
+                    btnEl.disabled = false;
+                    btnEl.innerText = "Channel Verse";
+                }, 400);
+            }
+        }
+
+        // Generate the first poem when the page loads
+        // Giving the script a split second to make sure puter is fully initialized
+        window.onload = () => {
+            setTimeout(generateAIPoetry, 500);
+        };
+    </script>
+</body>
+</html>
 
