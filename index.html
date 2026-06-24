@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura: A Mood & Poetry Visualizer</title>
+    <style>
+        /* Base Styling */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Georgia', serif;
+            color: #ffffff;
+            overflow: hidden;
+            text-align: center;
+            /* This makes the background colors transition like flowing liquid */
+            background: linear-gradient(135deg, #111, #222);
+            background-size: 400% 400%;
+            transition: background 2.5s ease-in-out;
+            animation: gradientMovement 15s ease infinite;
+        }
+
+        /* Subtle ambient motion for the background gradient */
+        @keyframes gradientMovement {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* The Gallery Frame container */
+        .container {
+            max-width: 700px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Beautiful, large literary typography */
+        .quote-text {
+            font-size: 2.2rem;
+            line-height: 1.6;
+            font-style: italic;
+            margin-bottom: 25px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 1.2s ease, transform 1.2s ease;
+        }
+
+        /* Subtle tag for the mood/vibe */
+        .mood-tag {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            margin-bottom: 40px;
+        }
+
+        /* When active, trigger smooth CSS fade-ins */
+        .visible {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        /* Minimalist, elegant button */
+        button {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 12px 28px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.4s ease;
+            outline: none;
+        }
+
+        button:hover {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 8px 20px rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="quoteDisplay" class="quote-text"></div>
+        <div id="moodDisplay" class="mood-tag"></div>
+        <button onclick="changeMood()">Seek Perspective</button>
+    </div>
+
+    <script>
+        // A curated collection of lines and their associated ambient visual states
+        const GALLERY = [
+            {
+                text: "The stars are not afraid of appearing like fireflies.",
+                mood: "Cosmic Serenity",
+                background: "linear-gradient(135deg, #0f2027, #203a43, #2c5364)" // Deep ocean/space blues
+            },
+            {
+                text: "I am radiating white light like an electric light bulb.",
+                mood: "Ethereal Energy",
+                background: "linear-gradient(135deg, #8a2387, #e94057, #f27121)" // Vibrant, shifting sunset auras
+            },
+            {
+                text: "In the depth of winter, I finally learned that within me there lay an invincible summer.",
+                mood: "Invincible Hope",
+                background: "linear-gradient(135deg, #11998e, #38ef7d)" // Energetic, fresh spring greens
+            },
+            {
+                text: "Midnight spent over textbooks leaves a distinct quietude in the bones.",
+                mood: "Nocturnal Focus",
+                background: "linear-gradient(135deg, #141e30, #243b55)" // Dark ink and midnight slate
+            },
+            {
+                text: "I am full of clouds and stars, waiting for the sky to clear.",
+                mood: "Melancholic Drift",
+                background: "linear-gradient(135deg, #403b4a, #e7e9bb)" // Misty purples bleeding into pale gold
+            },
+            {
+                text: "There is poetry in the hum of high-performance engines slicing through the quiet.",
+                mood: "Velocity",
+                background: "linear-gradient(135deg, #000000, #434343, #8e0000)" // Crimson sparks on matte black
+            }
+        ];
+
+        let lastIndex = -1;
+
+        function changeMood() {
+            const textEl = document.getElementById("quoteDisplay");
+            const moodEl = document.getElementById("moodDisplay");
+            
+            // 1. Instantly fade out the current text/tag
+            textEl.classList.remove("visible");
+            moodEl.classList.remove("visible");
+            
+            // 2. Wait for the fade-out transition to finish (400ms) before changing content
+            setTimeout(() => {
+                let randomIndex;
+                
+                // Ensure we don't accidentally pick the same quote twice in a row
+                do {
+                    randomIndex = Math.floor(Math.random() * GALLERY.length);
+                } while (randomIndex === lastIndex && GALLERY.length > 1);
+                
+                lastIndex = randomIndex;
+                const chosenItem = GALLERY[randomIndex];
+                
+                // 3. Swap the text and apply the new color gradient background
+                textEl.innerText = chosenItem.text;
+                moodEl.innerText = chosenItem.mood;
+                document.body.style.background = chosenItem.background;
+                document.body.style.backgroundSize = "400% 400%"; // Keep it liquid
+                
+                // 4. Smoothly fade the brand-new text back in
+                textEl.classList.add("visible");
+                moodEl.classList.add("visible");
+            }, 400);
+        }
+
+        // Initialize the first poetic visual automatically when landing on the page
+        changeMood();
+    </script>
+</body>
+</html>
