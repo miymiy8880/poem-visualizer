@@ -1,1 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura: Deep Introspective Visualizer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Georgia', serif;
+            color: #ffffff;
+            overflow: hidden;
+            text-align: center;
+            background: linear-gradient(135deg, #09090e, #131124, #22123b);
+            background-size: 400% 400%;
+            transition: background 3s ease-in-out;
+            animation: gradientMovement 20s ease infinite;
+        }
+
+        @keyframes gradientMovement {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 750px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quote-text {
+            font-size: 2rem;
+            line-height: 1.7;
+            font-style: italic;
+            margin-bottom: 30px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 1.2s ease, transform 1.2s ease;
+        }
+
+        .mood-tag {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 18px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .visible {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
+        }
+
+        button {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 14px 32px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.5s ease;
+            outline: none;
+        }
+
+        button:hover {
+            background: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+            box-shadow: 0 10px 25px rgba(255,255,255,0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="quoteDisplay" class="quote-text">Awakening the mind...</div>
+        <div id="moodDisplay" class="mood-tag">Connecting</div>
+        <button id="actionBtn" onclick="generatePerspective()">Seek Perspective</button>
+    </div>
+
+    <script>
+        const GRADIENTS = [
+            "linear-gradient(135deg, #09090e, #131124, #22123b)", // Void Mysticism
+            "linear-gradient(135deg, #0d1b2a, #1b263b, #415a77)", // Deep Oceanic Consciousness
+            "linear-gradient(135deg, #280f34, #180b22, #0f172a)", // Cosmic Alchemy
+            "linear-gradient(135deg, #102a23, #061712, #1a1c1e)", // Emerald Shamanic Resonance
+            "linear-gradient(135deg, #4c1d95, #762572, #1e1b4b)", // Violet Transmutation
+            "linear-gradient(135deg, #371a1a, #1a0f0f, #0c0a0a)"  // Primal Fire
+        ];
+
+        const MOODS = ["Cosmic Alignment", "Ethereal Drift", "Shadow Work", "Sacred Silence", "Timeless Paradox", "Alchemical Fire", "The Quiet Void", "Introspective Echo", "Nocturnal Focus"];
+
+        // Large internal base of philosophical and deep literary thoughts
+        const ESOTERIC_POOL = [
+            "The stars are not afraid of appearing like fireflies.",
+            "I am radiating white light like an electric light bulb.",
+            "In the depth of winter, I finally learned that within me there lay an invincible summer.",
+            "Midnight spent over textbooks leaves a distinct quietude in the bones.",
+            "I am full of clouds and stars, waiting for the sky to clear.",
+            "There is poetry in the hum of high-performance engines slicing through the quiet.",
+            "Turn your wounds into wisdom and let the universe orchestrate the rest.",
+            "He who looks outside, dreams; he who looks inside, awakes.",
+            "The wound is the place where the Light enters you.",
+            "What you are seeking is also seeking you.",
+            "Do not be satisfied with the stories that come before you. Unfold your own myth.",
+            "Silence is the language of God, all else is poor translation.",
+            "You are not a drop in the ocean. You are the entire ocean in a drop.",
+            "The mirror reflects all objects without being stained by them.",
+            "To understand the universe, you must understand the silence within it."
+        ];
+
+        let publicQuotes = [];
+        let lastText = "";
+
+        // Pre-fetch public philosophical quotes cleanly in the background
+        async function fetchBackupQuotes() {
+            try {
+                const response = await fetch("https://type.fit/api/quotes");
+                const data = await response.json();
+                // Filter out short or deeply profound sounding ones
+                publicQuotes = data.map(q => q.text);
+            } catch (e) {
+                console.log("Using primary esoteric pool exclusively.");
+            }
+        }
+
+        function generatePerspective() {
+            const textEl = document.getElementById("quoteDisplay");
+            const moodEl = document.getElementById("moodDisplay");
+
+            textEl.classList.remove("visible");
+            moodEl.classList.remove("visible");
+
+            setTimeout(() => {
+                let chosenText = "";
+                
+                // Combine our premium deep pool with fetched open web quotes if they loaded
+                const finalPool = ESOTERIC_POOL.concat(publicQuotes);
+
+                // Pick randomly ensuring no immediate back-to-back repetitions
+                do {
+                    chosenText = finalPool[Math.floor(Math.random() * finalPool.length)];
+                } while (chosenText === lastText && finalPool.length > 1);
+
+                lastText = chosenText;
+
+                const randomGradient = GRADIENTS[Math.floor(Math.random() * GRADIENTS.length)];
+                const randomMood = MOODS[Math.floor(Math.random() * MOODS.length)];
+
+                textEl.innerText = chosenText;
+                moodEl.innerText = randomMood;
+                document.body.style.background = randomGradient;
+                document.body.style.backgroundSize = "400% 400%";
+
+                textEl.classList.add("visible");
+                moodEl.classList.add("visible");
+            }, 400);
+        }
+
+        // Initialize
+        window.onload = async () => {
+            await fetchBackupQuotes();
+            generatePerspective();
+        };
+    </script>
+</body>
+</html>
 
